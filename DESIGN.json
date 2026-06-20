@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-20T00:00:00Z",
+  "title": "Design System: Instagram Photo Optimizer",
+  "extensions": {
+    "colorMeta": {
+      "action-red": {
+        "role": "primary",
+        "displayName": "Action Red",
+        "canonical": "oklch(55% 0.22 358)",
+        "tonalRamp": [
+          "oklch(12% 0.08 358)",
+          "oklch(22% 0.13 358)",
+          "oklch(32% 0.17 358)",
+          "oklch(43% 0.20 358)",
+          "oklch(55% 0.22 358)",
+          "oklch(66% 0.20 358)",
+          "oklch(78% 0.15 358)",
+          "oklch(90% 0.08 358)"
+        ]
+      },
+      "action-red-deep": {
+        "role": "primary-hover",
+        "displayName": "Action Red Deep",
+        "canonical": "oklch(48% 0.22 358)",
+        "tonalRamp": []
+      },
+      "surface-base": {
+        "role": "neutral",
+        "displayName": "Surface Base",
+        "canonical": "oklch(5% 0.003 30)",
+        "tonalRamp": [
+          "oklch(5% 0.003 30)",
+          "oklch(10% 0.004 30)",
+          "oklch(15% 0.005 30)",
+          "oklch(22% 0.006 30)",
+          "oklch(32% 0.006 30)",
+          "oklch(48% 0.007 30)",
+          "oklch(65% 0.007 30)",
+          "oklch(82% 0.005 30)"
+        ]
+      },
+      "surface-card": {
+        "role": "neutral",
+        "displayName": "Surface Card",
+        "canonical": "oklch(8% 0.003 30)",
+        "tonalRamp": []
+      },
+      "surface-input": {
+        "role": "neutral",
+        "displayName": "Surface Input",
+        "canonical": "oklch(10% 0.004 30)",
+        "tonalRamp": []
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Text Primary",
+        "canonical": "oklch(89% 0.002 0)",
+        "tonalRamp": [
+          "oklch(10% 0.002 0)",
+          "oklch(22% 0.002 0)",
+          "oklch(35% 0.002 0)",
+          "oklch(50% 0.002 0)",
+          "oklch(65% 0.002 0)",
+          "oklch(78% 0.002 0)",
+          "oklch(89% 0.002 0)",
+          "oklch(96% 0.001 0)"
+        ]
+      },
+      "status-success": {
+        "role": "tertiary",
+        "displayName": "Status Success",
+        "canonical": "oklch(80% 0.19 148)",
+        "tonalRamp": [
+          "oklch(12% 0.07 148)",
+          "oklch(22% 0.10 148)",
+          "oklch(35% 0.14 148)",
+          "oklch(50% 0.17 148)",
+          "oklch(65% 0.19 148)",
+          "oklch(75% 0.20 148)",
+          "oklch(80% 0.19 148)",
+          "oklch(92% 0.10 148)"
+        ]
+      },
+      "status-warning": {
+        "role": "tertiary",
+        "displayName": "Status Warning",
+        "canonical": "oklch(78% 0.19 75)",
+        "tonalRamp": [
+          "oklch(12% 0.07 75)",
+          "oklch(22% 0.10 75)",
+          "oklch(35% 0.14 75)",
+          "oklch(50% 0.17 75)",
+          "oklch(63% 0.19 75)",
+          "oklch(73% 0.20 75)",
+          "oklch(78% 0.19 75)",
+          "oklch(91% 0.10 75)"
+        ]
+      },
+      "status-error": {
+        "role": "tertiary",
+        "displayName": "Status Error",
+        "canonical": "oklch(72% 0.17 22)",
+        "tonalRamp": [
+          "oklch(12% 0.07 22)",
+          "oklch(22% 0.10 22)",
+          "oklch(35% 0.13 22)",
+          "oklch(48% 0.15 22)",
+          "oklch(58% 0.17 22)",
+          "oklch(65% 0.17 22)",
+          "oklch(72% 0.17 22)",
+          "oklch(88% 0.10 22)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Page title only. One instance per page." },
+      "body": { "displayName": "Body", "purpose": "Primary reading size. Drop zone instructions, general UI text." },
+      "label": { "displayName": "Label", "purpose": "Settings field labels only. Uppercase uppercase treatment reserved for this role." },
+      "caption": { "displayName": "Caption", "purpose": "File size numbers, spec pills, status strings, dimension data." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-state", "value": "ease", "duration": "0.15s", "purpose": "Button and border color transitions." },
+      { "name": "ease-drop", "value": "ease", "duration": "0.2s", "purpose": "Drop zone border and background on drag-over." },
+      { "name": "ease-progress", "value": "ease", "duration": "0.25s", "purpose": "Progress bar fill width." }
+    ],
+    "breakpoints": [
+      { "name": "max-width", "value": "960px", "purpose": "Single centered column. No sidebar breakpoints." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main action. Download ZIP, process images.",
+      "html": "<button class=\"ds-btn-primary\">Download all as ZIP</button>",
+      "css": ".ds-btn-primary { background: #E1306C; color: #fefefe; padding: 9px 20px; border-radius: 8px; border: none; font-size: 13.5px; font-weight: 500; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; transition: background 0.15s ease, opacity 0.15s ease; } .ds-btn-primary:hover { background: #c82b61; } .ds-btn-primary:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action. Clear, dismiss.",
+      "html": "<button class=\"ds-btn-ghost\">Clear</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: #555555; padding: 9px 20px; border-radius: 8px; border: 1px solid #222222; font-size: 13.5px; font-weight: 500; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; transition: color 0.15s ease, border-color 0.15s ease; } .ds-btn-ghost:hover { color: #888888; border-color: #333333; } .ds-btn-ghost:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; }"
+    },
+    {
+      "name": "Spec Pill",
+      "kind": "chip",
+      "refersTo": "spec-pill",
+      "description": "Read-only metadata badge. Format, size limits, aspect ratios.",
+      "html": "<div class=\"ds-spec-pill\"><strong>Format:</strong> JPEG</div>",
+      "css": ".ds-spec-pill { background: #111111; border: 1px solid #1e1e1e; border-radius: 20px; padding: 4px 12px; font-size: 11.5px; color: #888888; display: inline-flex; align-items: center; gap: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; white-space: nowrap; } .ds-spec-pill strong { color: #cccccc; font-weight: 500; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Settings control. Target size, quality floor, max width.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\">Target max file size</label><select class=\"ds-input\"><option>3.5 MB (Instagram safe zone)</option></select></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 5px; } .ds-field-label { font-size: 11px; color: #555555; text-transform: uppercase; letter-spacing: 0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-input { background: #111111; border: 1px solid #2a2a2a; color: #e0e0e0; padding: 7px 10px; border-radius: 7px; font-size: 13px; width: 140px; outline: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; transition: border-color 0.15s ease; } .ds-input:focus { border-color: #E1306C; }"
+    },
+    {
+      "name": "Drop Zone",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Primary file intake. Drag-and-drop or click-to-browse.",
+      "html": "<div class=\"ds-drop-zone\"><div class=\"ds-drop-icon\">📷</div><p>Drop photos here or <span class=\"ds-drop-browse\">browse files</span></p><small>JPEG · PNG · WebP — multiple files OK</small></div>",
+      "css": ".ds-drop-zone { border: 2px dashed #252525; border-radius: 14px; padding: 52px 24px; text-align: center; cursor: pointer; transition: border-color 0.2s ease, background 0.2s ease; user-select: none; } .ds-drop-zone:hover, .ds-drop-zone.over { border-color: #E1306C; background: rgba(225, 48, 108, 0.04); } .ds-drop-zone:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; } .ds-drop-icon { font-size: 38px; margin-bottom: 14px; line-height: 1; } .ds-drop-zone p { font-size: 14px; color: #555555; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-drop-browse { color: #E1306C; cursor: pointer; } .ds-drop-zone small { font-size: 11.5px; color: #333333; margin-top: 6px; display: block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Photo Card",
+      "kind": "card",
+      "refersTo": "photo-card",
+      "description": "Per-image result card. Shows thumbnail, sizes, quality, and download.",
+      "html": "<div class=\"ds-photo-card ds-photo-card--done\"><img class=\"ds-photo-thumb\" src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\" alt=\"\"><div class=\"ds-photo-body\"><div class=\"ds-photo-name\">IMG_4521_ig.jpg</div><div class=\"ds-photo-sizes\"><span class=\"ds-photo-before\">4.20 MB</span><span class=\"ds-photo-after\">2.10 MB</span></div><div class=\"ds-photo-dims\">1080x1350px · q87%</div><div class=\"ds-photo-status ds-photo-status--done\">Ready</div><button class=\"ds-photo-dl\">Download</button></div></div>",
+      "css": ".ds-photo-card { background: #0f0f0f; border: 1px solid #1e1e1e; border-radius: 11px; overflow: hidden; transition: border-color 0.2s ease; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-photo-card--done { border-color: #1a2e1a; } .ds-photo-card--error { border-color: #2e1a1a; } .ds-photo-thumb { width: 100%; aspect-ratio: 1; object-fit: contain; background: #050505; display: block; } .ds-photo-body { padding: 10px 12px 12px; } .ds-photo-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; color: #cccccc; } .ds-photo-sizes { display: flex; justify-content: space-between; font-size: 11px; color: #444444; } .ds-photo-after { color: #4ade80; } .ds-photo-dims { font-size: 10.5px; color: #333333; margin-top: 3px; } .ds-photo-status { font-size: 11px; margin-top: 5px; } .ds-photo-status--done { color: #4ade80; } .ds-photo-status--error { color: #f87171; } .ds-photo-status--processing { color: #555555; } .ds-photo-dl { display: block; width: 100%; margin-top: 8px; padding: 5px 0; background: #181818; border: 1px solid #2a2a2a; border-radius: 6px; font-size: 11.5px; color: #888888; cursor: pointer; text-align: center; font-family: inherit; transition: background 0.15s ease, color 0.15s ease; } .ds-photo-dl:hover { background: #222222; color: #e0e0e0; } .ds-photo-dl:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; }"
+    },
+    {
+      "name": "Progress Bar",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Batch processing progress. 3px thin bar, hidden between sessions.",
+      "html": "<div class=\"ds-progress\"><div class=\"ds-progress-fill\" style=\"width: 60%\"></div></div>",
+      "css": ".ds-progress { height: 3px; background: #1a1a1a; border-radius: 2px; } .ds-progress-fill { height: 100%; background: #E1306C; border-radius: 2px; transition: width 0.25s ease; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Darkroom",
+    "overview": "A film photographer's workspace after midnight. Light is minimal. Surfaces are deeply dark, not dramatically black. The one source of color in the room is the safelight: Action Red (#E1306C), glowing just enough to mark what's actionable. Everything else recedes into tonal dark. Depth comes from layered darkness, not shadow.\n\nTypography is system-native sans. Speed is the product; the font stack is a design decision that proves it.\n\nStatus colors are sealed. They are information, not decoration.",
+    "keyCharacteristics": [
+      "Deep dark surfaces in graduated tones; warmth comes from tonal variation, not a brand color",
+      "Action Red is the only saturated moment on any screen; its rarity is what makes it directional",
+      "System-native typography: fast, honest, zero pretension",
+      "Flat by default: no shadows, no blur. Depth is tonal",
+      "Status colors are sealed to their semantic role, never stylistic"
+    ],
+    "rules": [
+      { "name": "The Safelight Rule", "body": "Action Red appears on 10% or less of any screen. Buttons, focus rings, hover borders. The moment it appears on a card background, a heading, or a badge, the signal collapses.", "section": "colors" },
+      { "name": "The Sealed Status Rule", "body": "Status colors are sealed to their semantic role. A success-green button is prohibited. An amber heading is prohibited.", "section": "colors" },
+      { "name": "The No-Uppercase-Except-Labels Rule", "body": "Uppercase with positive letter-spacing is reserved strictly for label elements in settings fields.", "section": "typography" },
+      { "name": "The No-Shadow Rule", "body": "Shadows are prohibited. If the urge arises to add box-shadow, reconsider the tonal relationship between surfaces instead.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Action Red exclusively for interactive signals: primary buttons, input focus rings, drop zone hover, progress fill, browse link text.",
+      "Do use tonal surface layering for depth: Surface Base to Surface Card to Surface Input in that order.",
+      "Do use status colors strictly for processing outcomes.",
+      "Do keep focus states visible via Action Red border outline.",
+      "Do show original size, compressed size, and quality percentage on every card.",
+      "Do use system-native typography. No web font imports."
+    ],
+    "donts": [
+      "Don't use Action Red on card backgrounds, headings, status badges, or decorative dividers.",
+      "Don't add box-shadow, backdrop-filter, or drop-shadow anywhere.",
+      "Don't apply uppercase letter-spacing outside label elements.",
+      "Don't use status colors in any context other than processing state.",
+      "Don't animate CSS layout properties. Animate opacity, color, and transform only.",
+      "Don't nest cards inside cards.",
+      "Don't introduce sidebars, modals, drawers, or global navigation.",
+      "Don't add glassmorphism, blur, gradient text, or pixel-perfect light effects."
+    ]
+  }
+}
