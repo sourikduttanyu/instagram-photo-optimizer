@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Photo Optimizer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #080808;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 28px 24px 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header { margin-bottom: 24px; }
+    header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+    header p { color: #555; font-size: 12.5px; margin-top: 4px; }
+
+    /* Spec pills */
+    .spec-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .spec-pill {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11.5px;
+      color: #888;
+    }
+    .spec-pill strong { color: #ccc; }
+
+    /* Settings bar */
+    .settings {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field input, .field select {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      color: #e0e0e0;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 13px;
+      width: 140px;
+      outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: #E1306C; }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed #252525;
+      border-radius: 14px;
+      padding: 52px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 22px;
+      user-select: none;
+    }
+    .drop-zone:hover, .drop-zone.over {
+      border-color: #E1306C;
+      background: rgba(225, 48, 108, 0.04);
+    }
+    .drop-icon { font-size: 38px; margin-bottom: 14px; line-height: 1; }
+    .drop-zone p { font-size: 14px; color: #555; }
+    .drop-zone p span { color: #E1306C; cursor: pointer; }
+    .drop-zone small { font-size: 11.5px; color: #333; margin-top: 6px; display: block; }
+    #fileInput { display: none; }
+
+    /* Progress */
+    .progress { height: 3px; background: #1a1a1a; border-radius: 2px; margin-bottom: 20px; display: none; }
+    .progress-fill { height: 100%; background: #E1306C; border-radius: 2px; width: 0; transition: width 0.25s; }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 11px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .card.done { border-color: #1a2e1a; }
+    .card.error { border-color: #2e1a1a; }
+
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      background: #050505;
+      display: block;
+    }
+
+    .card-body { padding: 10px 12px 12px; }
+    .card-name {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 6px;
+      color: #ccc;
+    }
+
+    .card-sizes {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #444;
+    }
+    .card-sizes .after { color: #4ade80; }
+
+    .card-dims {
+      font-size: 10.5px;
+      color: #333;
+      margin-top: 3px;
+    }
+
+    .card-warn {
+      font-size: 10.5px;
+      color: #f59e0b;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .card-status {
+      font-size: 11px;
+      margin-top: 5px;
+    }
+    .card-status.processing { color: #555; }
+    .card-status.done { color: #4ade80; }
+    .card-status.error { color: #f87171; }
+
+    .card-dl {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      padding: 5px 0;
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      font-size: 11.5px;
+      color: #aaa;
+      cursor: pointer;
+      text-align: center;
+    }
+    .card-dl:hover { background: #222; color: #e0e0e0; }
+    .card.done .card-dl { display: block; }
+
+    /* Actions */
+    .actions {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .actions.visible { display: flex; }
+
+    .btn {
+      padding: 9px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: #E1306C; color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #c82b61; }
+    .btn-ghost {
+      background: transparent;
+      color: #555;
+      border: 1px solid #222;
+    }
+    .btn-ghost:hover { color: #aaa; border-color: #333; }
+
+    .summary { font-size: 12px; color: #444; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Instagram Photo Optimizer</h1>
+  <p>Batch resize &amp; compress for Instagram — binary-search max quality per image, no color remapping, same aspect ratio</p>
+</header>
+
+<div class="spec-row">
+  <div class="spec-pill"><strong>Format:</strong> JPEG</div>
+  <div class="spec-pill"><strong>Max width:</strong> 1080px</div>
+  <div class="spec-pill"><strong>Quality:</strong> auto (binary search to target)</div>
+  <div class="spec-pill"><strong>Color space:</strong> sRGB (browser-native)</div>
+  <div class="spec-pill"><strong>Safe aspect ratios:</strong> 1.91:1 → 4:5</div>
+  <div class="spec-pill"><strong>Ideal file size:</strong> &lt;3.6MB</div>
+</div>
+
+<div class="settings">
+  <div class="field">
+    <label>Target max file size</label>
+    <select id="targetSize">
+      <option value="3670016">3.5 MB (Instagram safe zone)</option>
+      <option value="2097152">2 MB (extra safe)</option>
+      <option value="1048576">1 MB (aggressive)</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Min quality floor (%)</label>
+    <input type="number" id="minQuality" value="75" min="50" max="95" step="1">
+  </div>
+  <div class="field">
+    <label>Max Width (px)</label>
+    <input type="number" id="maxWidth" value="1080" min="320" max="1080" step="1">
+  </div>
+</div>
+
+<div class="drop-zone" id="dropZone">
+  <div class="drop-icon">📷</div>
+  <p>Drop photos here or <span id="browseBtn">browse files</span></p>
+  <small>JPEG · PNG · WebP · GIF · BMP — multiple files OK</small>
+  <input type="file" id="fileInput" multiple accept="image/*">
+</div>
+
+<div class="progress" id="progress">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="actions" id="actions">
+  <button class="btn btn-primary" id="downloadAllBtn">Download all as ZIP</button>
+  <button class="btn btn-ghost" id="clearBtn">Clear</button>
+  <span class="summary" id="summary"></span>
+</div>
+
+<script>
+  const dropZone   = document.getElementById('dropZone');
+  const fileInput  = document.getElementById('fileInput');
+  const grid       = document.getElementById('grid');
+  const actions    = document.getElementById('actions');
+  const progress   = document.getElementById('progress');
+  const progressFill = document.getElementById('progressFill');
+  const downloadAllBtn = document.getElementById('downloadAllBtn');
+  const summaryEl  = document.getElementById('summary');
+
+  let queue = []; // { name, blob, origSize }
+
+  // ── Drag & drop ──────────────────────────────────────────────
+  dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('over'); });
+  dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('over');
+    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+    if (files.length) run(files);
+  });
+
+  document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('click', e => { if (e.target === dropZone) fileInput.click(); });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) run([...fileInput.files]);
+  });
+
+  // ── Clear ─────────────────────────────────────────────────────
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    queue = [];
+    grid.innerHTML = '';
+    actions.classList.remove('visible');
+    progress.style.display = 'none';
+    fileInput.value = '';
+    summaryEl.textContent = '';
+  });
+
+  // ── Main pipeline ─────────────────────────────────────────────
+  async function run(files) {
+    const targetBytes = parseInt(document.getElementById('targetSize').value) || 3670016;
+    const minQuality  = clamp(parseFloat(document.getElementById('minQuality').value) || 75, 1, 99) / 100;
+    const maxWidth    = clamp(parseInt(document.getElementById('maxWidth').value) || 1080, 1, 4096);
+
+    progress.style.display = 'block';
+    setProgress(0);
+    actions.classList.remove('visible');
+    downloadAllBtn.disabled = true;
+
+    for (let i = 0; i < files.length; i++) {
+      await processOne(files[i], targetBytes, minQuality, maxWidth);
+      setProgress(((i + 1) / files.length) * 100);
+    }
+
+    actions.classList.add('visible');
+    downloadAllBtn.disabled = false;
+
+    const origTotal = queue.reduce((s, f) => s + f.origSize, 0);
+    const newTotal  = queue.reduce((s, f) => s + f.blob.size, 0);
+    summaryEl.textContent =
+      `${queue.length} file${queue.length !== 1 ? 's' : ''} · ${fmt(origTotal)} → ${fmt(newTotal)}`;
+  }
+
+  async function processOne(file, targetBytes, minQuality, maxWidth) {
+    const card = makeCard(file.name, file.size);
+    grid.appendChild(card.el);
+
+    try {
+      const { blob, outW, outH, warning, quality } = await compress(file, targetBytes, minQuality, maxWidth);
+
+      const baseName = file.name.replace(/\.[^.]+$/, '');
+      const outName  = baseName + '_ig.jpg';
+
+      queue.push({ name: outName, blob, origSize: file.size });
+
+      card.update({
+        origSize: file.size,
+        newSize:  blob.size,
+        dims: `${outW}×${outH}px · q${Math.round(quality * 100)}%`,
+        warning,
+        status: 'done',
+        previewUrl: URL.createObjectURL(blob),
+      });
+
+      card.dlBtn.addEventListener('click', () => downloadBlob(blob, outName));
+
+    } catch (err) {
+      card.update({ status: 'error', statusText: String(err.message || err) });
+    }
+  }
+
+  // ── Canvas compress with binary-search quality ────────────────
+  // Draw image once, then binary-search toBlob quality to find
+  // the highest quality that fits under targetBytes.
+  function compress(file, targetBytes, minQuality, maxWidth) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+
+      img.onload = async () => {
+        URL.revokeObjectURL(url);
+
+        let w = img.naturalWidth;
+        let h = img.naturalHeight;
+        const ratio = w / h;
+
+        // Scale down only — never upscale
+        if (w > maxWidth) {
+          h = Math.round((maxWidth / w) * h);
+          w = maxWidth;
+        }
+
+        // Aspect ratio safety check (Instagram range: 1.91:1 → 4:5 = 0.8)
+        let warning = null;
+        if (ratio > 1.91 + 0.01) {
+          warning = `Ratio ${ratio.toFixed(2)}:1 exceeds 1.91:1 max — Instagram may letter-crop`;
+        } else if (ratio < 0.80 - 0.01) {
+          warning = `Ratio ${ratio.toFixed(2)}:1 narrower than 4:5 — Instagram may letter-crop`;
+        }
+
+        // Draw once
+        const canvas = document.createElement('canvas');
+        canvas.width  = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { colorSpace: 'srgb' });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const toBlob = (q) => new Promise((res, rej) =>
+          canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob failed')), 'image/jpeg', q)
+        );
+
+        // Binary search: highest quality that fits targetBytes
+        // Tolerance: stop when within 50 KB of target or quality range < 1%
+        let lo = minQuality;
+        let hi = 1.0;
+        let best = null;
+        let bestQ = lo;
+
+        // First check: if max quality (1.0) fits, use it directly
+        const maxBlob = await toBlob(1.0);
+        if (maxBlob.size <= targetBytes) {
+          resolve({ blob: maxBlob, outW: w, outH: h, warning, quality: 1.0 });
+          return;
+        }
+
+        // Binary search (max 8 iterations)
+        for (let i = 0; i < 8; i++) {
+          const mid = (lo + hi) / 2;
+          const blob = await toBlob(mid);
+
+          if (blob.size <= targetBytes) {
+            best  = blob;
+            bestQ = mid;
+            lo    = mid; // can go higher
+          } else {
+            hi = mid;    // too big, go lower
+          }
+
+          // Converged close enough
+          if ((hi - lo) < 0.005) break;
+        }
+
+        // Fallback: if nothing fit (minQuality still too big), use minQuality
+        if (!best) {
+          best  = await toBlob(minQuality);
+          bestQ = minQuality;
+        }
+
+        resolve({ blob: best, outW: w, outH: h, warning, quality: bestQ });
+      };
+
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not load image')); };
+      img.src = url;
+    });
+  }
+
+  // ── Download all ZIP ──────────────────────────────────────────
+  downloadAllBtn.addEventListener('click', async () => {
+    if (!queue.length) return;
+    downloadAllBtn.disabled = true;
+    downloadAllBtn.textContent = 'Zipping…';
+
+    const zip = new JSZip();
+    queue.forEach(f => zip.file(f.name, f.blob));
+
+    const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+    downloadBlob(blob, 'instagram_optimized.zip');
+
+    downloadAllBtn.disabled = false;
+    downloadAllBtn.textContent = 'Download all as ZIP';
+  });
+
+  // ── Card factory ──────────────────────────────────────────────
+  function makeCard(name, origSize) {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <img class="card-thumb" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
+      <div class="card-body">
+        <div class="card-name" title="${esc(name)}">${esc(name)}</div>
+        <div class="card-sizes">
+          <span class="before">${fmt(origSize)}</span>
+          <span class="after">—</span>
+        </div>
+        <div class="card-dims"></div>
+        <div class="card-warn"></div>
+        <div class="card-status processing">Processing…</div>
+        <button class="card-dl">↓ Download</button>
+      </div>`;
+
+    const thumb   = el.querySelector('.card-thumb');
+    const sizeBef = el.querySelector('.before');
+    const sizeAft = el.querySelector('.after');
+    const dims    = el.querySelector('.card-dims');
+    const warn    = el.querySelector('.card-warn');
+    const status  = el.querySelector('.card-status');
+    const dlBtn   = el.querySelector('.card-dl');
+
+    return {
+      el,
+      dlBtn,
+      update({ origSize, newSize, dims: d, warning, status: s, statusText, previewUrl }) {
+        if (previewUrl)  thumb.src = previewUrl;
+        if (origSize)    sizeBef.textContent = fmt(origSize);
+        if (newSize)     sizeAft.textContent = fmt(newSize);
+        if (d)           dims.textContent = d;
+        if (warning)     warn.textContent = '⚠ ' + warning;
+        if (s) {
+          el.classList.add(s);
+          status.className = 'card-status ' + s;
+          status.textContent = statusText || (s === 'done' ? '✓ Ready' : s);
+        }
+      }
+    };
+  }
+
+  // ── Utilities ─────────────────────────────────────────────────
+  function downloadBlob(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  }
+
+  function setProgress(pct) { progressFill.style.width = pct + '%'; }
+
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  function fmt(bytes) {
+    if (bytes < 1024)          return bytes + ' B';
+    if (bytes < 1024 * 1024)   return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
