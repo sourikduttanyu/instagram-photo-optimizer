@@ -10,6 +10,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
       background: #080808;
       color: #e0e0e0;
       min-height: 100vh;
@@ -19,7 +21,7 @@
     }
 
     header { margin-bottom: 24px; }
-    header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+    header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; line-height: 1.3; }
     header p { color: #555; font-size: 12.5px; margin-top: 4px; }
 
     /* Spec pills */
@@ -27,7 +29,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
     .spec-pill {
       background: #111;
@@ -58,6 +60,8 @@
       font-size: 13px;
       width: 140px;
       outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
     }
     .field input:focus, .field select:focus { border-color: #E1306C; }
 
@@ -68,13 +72,17 @@
       padding: 52px 24px;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 22px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      margin-bottom: 24px;
       user-select: none;
     }
     .drop-zone:hover, .drop-zone.over {
       border-color: #E1306C;
       background: rgba(225, 48, 108, 0.04);
+    }
+    .drop-zone:focus-visible {
+      outline: 2px solid #E1306C;
+      outline-offset: 2px;
     }
     .drop-icon { font-size: 38px; margin-bottom: 14px; line-height: 1; }
     .drop-zone p { font-size: 14px; color: #555; }
@@ -84,7 +92,7 @@
 
     /* Progress */
     .progress { height: 3px; background: #1a1a1a; border-radius: 2px; margin-bottom: 20px; display: none; }
-    .progress-fill { height: 100%; background: #E1306C; border-radius: 2px; width: 0; transition: width 0.25s; }
+    .progress-fill { height: 100%; background: #E1306C; border-radius: 2px; width: 0; transition: width 0.25s ease; }
 
     /* Grid */
     .grid {
@@ -99,7 +107,7 @@
       border: 1px solid #1e1e1e;
       border-radius: 11px;
       overflow: hidden;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s ease;
     }
     .card.done { border-color: #1a2e1a; }
     .card.error { border-color: #2e1a1a; }
@@ -161,11 +169,14 @@
       border: 1px solid #2a2a2a;
       border-radius: 6px;
       font-size: 11.5px;
-      color: #aaa;
+      color: #888;
       cursor: pointer;
       text-align: center;
+      font-family: inherit;
+      transition: background 0.15s ease, color 0.15s ease;
     }
     .card-dl:hover { background: #222; color: #e0e0e0; }
+    .card-dl:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; }
     .card.done .card-dl { display: block; }
 
     /* Actions */
@@ -184,19 +195,26 @@
       font-size: 13.5px;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s, opacity 0.15s;
+      font-family: inherit;
+      transition: background 0.15s ease, opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-primary { background: #E1306C; color: #fff; }
+    .btn-primary { background: #E1306C; color: #fefefe; }
     .btn-primary:hover:not(:disabled) { background: #c82b61; }
+    .btn-primary:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; }
     .btn-ghost {
       background: transparent;
       color: #555;
       border: 1px solid #222;
     }
-    .btn-ghost:hover { color: #aaa; border-color: #333; }
+    .btn-ghost:hover { color: #888; border-color: #333; }
+    .btn-ghost:focus-visible { outline: 2px solid #E1306C; outline-offset: 2px; }
 
     .summary { font-size: 12px; color: #444; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -205,6 +223,8 @@
   <h1>Instagram Photo Optimizer</h1>
   <p>Batch resize &amp; compress for Instagram — binary-search max quality per image, no color remapping, same aspect ratio</p>
 </header>
+
+<main>
 
 <div class="spec-row">
   <div class="spec-pill"><strong>Format:</strong> JPEG</div>
@@ -217,7 +237,7 @@
 
 <div class="settings">
   <div class="field">
-    <label>Target max file size</label>
+    <label for="targetSize">Target max file size</label>
     <select id="targetSize">
       <option value="3670016">3.5 MB (Instagram safe zone)</option>
       <option value="2097152">2 MB (extra safe)</option>
@@ -225,43 +245,45 @@
     </select>
   </div>
   <div class="field">
-    <label>Min quality floor (%)</label>
+    <label for="minQuality">Min quality floor (%)</label>
     <input type="number" id="minQuality" value="75" min="50" max="95" step="1">
   </div>
   <div class="field">
-    <label>Max Width (px)</label>
+    <label for="maxWidth">Max width (px)</label>
     <input type="number" id="maxWidth" value="1080" min="320" max="1080" step="1">
   </div>
 </div>
 
-<div class="drop-zone" id="dropZone">
-  <div class="drop-icon">📷</div>
-  <p>Drop photos here or <span id="browseBtn">browse files</span></p>
+<div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Drop photos here or press Enter to browse files">
+  <div class="drop-icon" aria-hidden="true">📷</div>
+  <p>Drop photos here or <span id="browseBtn" role="button" tabindex="0">browse files</span></p>
   <small>JPEG · PNG · WebP · GIF · BMP — multiple files OK</small>
-  <input type="file" id="fileInput" multiple accept="image/*">
+  <input type="file" id="fileInput" multiple accept="image/*" aria-label="Select image files">
 </div>
 
-<div class="progress" id="progress">
+<div class="progress" id="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Processing progress">
   <div class="progress-fill" id="progressFill"></div>
 </div>
 
 <div class="grid" id="grid"></div>
 
 <div class="actions" id="actions">
-  <button class="btn btn-primary" id="downloadAllBtn">Download all as ZIP</button>
-  <button class="btn btn-ghost" id="clearBtn">Clear</button>
+  <button type="button" class="btn btn-primary" id="downloadAllBtn">Download all as ZIP</button>
+  <button type="button" class="btn btn-ghost" id="clearBtn">Clear</button>
   <span class="summary" id="summary"></span>
 </div>
 
+</main>
+
 <script>
-  const dropZone   = document.getElementById('dropZone');
-  const fileInput  = document.getElementById('fileInput');
-  const grid       = document.getElementById('grid');
-  const actions    = document.getElementById('actions');
-  const progress   = document.getElementById('progress');
-  const progressFill = document.getElementById('progressFill');
+  const dropZone      = document.getElementById('dropZone');
+  const fileInput     = document.getElementById('fileInput');
+  const grid          = document.getElementById('grid');
+  const actions       = document.getElementById('actions');
+  const progress      = document.getElementById('progress');
+  const progressFill  = document.getElementById('progressFill');
   const downloadAllBtn = document.getElementById('downloadAllBtn');
-  const summaryEl  = document.getElementById('summary');
+  const summaryEl     = document.getElementById('summary');
 
   let queue = []; // { name, blob, origSize }
 
@@ -275,8 +297,17 @@
     if (files.length) run(files);
   });
 
-  document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
   dropZone.addEventListener('click', e => { if (e.target === dropZone) fileInput.click(); });
+  dropZone.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+
+  const browseBtn = document.getElementById('browseBtn');
+  browseBtn.addEventListener('click', () => fileInput.click());
+  browseBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+
   fileInput.addEventListener('change', () => {
     if (fileInput.files.length) run([...fileInput.files]);
   });
@@ -329,6 +360,7 @@
       queue.push({ name: outName, blob, origSize: file.size });
 
       card.update({
+        imgName:  file.name,
         origSize: file.size,
         newSize:  blob.size,
         dims: `${outW}×${outH}px · q${Math.round(quality * 100)}%`,
@@ -461,8 +493,8 @@
         </div>
         <div class="card-dims"></div>
         <div class="card-warn"></div>
-        <div class="card-status processing">Processing…</div>
-        <button class="card-dl">↓ Download</button>
+        <div class="card-status processing" aria-live="polite">Processing…</div>
+        <button type="button" class="card-dl">↓ Download</button>
       </div>`;
 
     const thumb   = el.querySelector('.card-thumb');
@@ -476,12 +508,12 @@
     return {
       el,
       dlBtn,
-      update({ origSize, newSize, dims: d, warning, status: s, statusText, previewUrl }) {
-        if (previewUrl)  thumb.src = previewUrl;
-        if (origSize)    sizeBef.textContent = fmt(origSize);
-        if (newSize)     sizeAft.textContent = fmt(newSize);
-        if (d)           dims.textContent = d;
-        if (warning)     warn.textContent = '⚠ ' + warning;
+      update({ imgName, origSize, newSize, dims: d, warning, status: s, statusText, previewUrl }) {
+        if (previewUrl) { thumb.src = previewUrl; thumb.alt = imgName || name; }
+        if (origSize)   sizeBef.textContent = fmt(origSize);
+        if (newSize)    sizeAft.textContent = fmt(newSize);
+        if (d)          dims.textContent = d;
+        if (warning)    warn.textContent = '⚠ ' + warning;
         if (s) {
           el.classList.add(s);
           status.className = 'card-status ' + s;
@@ -500,7 +532,10 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
   }
 
-  function setProgress(pct) { progressFill.style.width = pct + '%'; }
+  function setProgress(pct) {
+    progressFill.style.width = pct + '%';
+    progress.setAttribute('aria-valuenow', Math.round(pct));
+  }
 
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
 
